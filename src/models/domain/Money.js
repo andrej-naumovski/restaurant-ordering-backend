@@ -10,7 +10,7 @@ export default class Money {
     const { _value, _currency } = this
     return {
       value: _value,
-      currency: _currency
+      currency: _currency,
     }
   }
 }

@@ -5,3 +5,5 @@ export const TableDataSchema = mongoose.Schema({
   isAvailable: Boolean,
   employeeId: String,
 })
+
+export default mongoose.model('TableData', TableDataSchema)
