@@ -8,6 +8,8 @@ import morgan from 'morgan'
 
 import * as config from './config'
 
+// Routes
+import restaurantRouter from './controllers/RestaurantController'
 
 /*
   Create Express app
@@ -42,6 +44,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 /*
   Add module routes to Express app
  */
+app.use('/restaurants', restaurantRouter)
 
 /*
   Get port from process or use 5000 if nonexistent
