@@ -10,5 +10,6 @@
     "logs",
     "lib/jasmine_examples",
     "db"
-  ]
+  ],
+  "plugins": ["transform-object-rest-spread"]
 }
