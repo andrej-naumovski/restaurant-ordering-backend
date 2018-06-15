@@ -15,6 +15,7 @@
   "dependencies": {
     "body-parser": "^1.18.1",
     "express": "^4.15.4",
+    "money-math": "^2.5.1",
     "mongoose": "^4.11.12",
     "morgan": "^1.9.0",
     "winston": "^2.3.1"
