@@ -12,6 +12,15 @@ const validateLocation = location => {
   return Joi.validate(location, validationSchema)
 }
 
+const validateTableReservationRequest = reservationBody => {
+  const validationSchema = Joi.object().keys({
+    tableId: Joi.string().required(),
+    isReserved: Joi.boolean().required(),
+  })
+
+  return Joi.validate(reservationBody, validationSchema)
+}
+
 const restaurantRouter = Router()
 
 const getNearestRestaurants = async (req, res) => {
@@ -39,6 +48,33 @@ const getNearestRestaurants = async (req, res) => {
   })
 }
 
+const updateTableReservation = async (req, res) => {
+  if (!validateTableReservationRequest(req.body)) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid parameters!',
+    })
+  }
+
+  const { restaurantId } = req.params
+  const { tableId, isReserved } = req.body
+
+  const isReservationSuccessful = RestaurantService.updateTableReservation(restaurantId, tableId, isReserved)
+
+  if (isReservationSuccessful) {
+    return res.status(200).send({
+      status: 200,
+      message: 'Reservation is successful!',
+    })
+  }
+
+  return res.status(500).send({
+    status: 500,
+    message: 'Reservation unsuccessful, please try again.',
+  })
+}
+
 restaurantRouter.get('/nearest', getNearestRestaurants)
+restaurantRouter.put('/:restaurantId/reserve', updateTableReservation)
 
 export default restaurantRouter
