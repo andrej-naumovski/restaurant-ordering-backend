@@ -1,5 +1,7 @@
 import mongoose from 'mongoose'
 
+import { MoneySchema } from './Money'
+
 const OrderSchema = mongoose.Schema({
   restaurantId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -12,7 +14,9 @@ const OrderSchema = mongoose.Schema({
   items: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'MenuItem',
-  }]
+  }],
+  isCompleted: Boolean,
+  totalValue: MoneySchema,
 })
 
 export default mongoose.model('Order', OrderSchema)
