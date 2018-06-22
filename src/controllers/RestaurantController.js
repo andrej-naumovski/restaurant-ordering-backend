@@ -42,7 +42,8 @@ const getNearestRestaurants = async (req, res) => {
 
   return res.status(200).send({
     status: 200,
-    message: {
+    message: 'Success',
+    payload: {
       restaurantList: nearestRestaurants,
     },
   })
@@ -95,9 +96,10 @@ const getMenuForRestaurant = async (req, res) => {
 
   return res.status(200).send({
     status: 200,
-    message: {
-      menu,
-    },
+    message: 'Success',
+    payload: {
+      menu
+    }
   })
 }
 
