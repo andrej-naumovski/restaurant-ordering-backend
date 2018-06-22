@@ -13,13 +13,16 @@ const mockRestaurants = [{
     latitude: 42.0017616919817,
     longitude: 21.4065151072028,
   },
-  tables: []
+  tables: [],
+  menu: {
+    categories: []
+  }
 }]
 
 Restaurant.find = () => new Promise(resolve => resolve(mockRestaurants))
 
 Restaurant.findById
-  = (id) => new Promise(resolve => resolve(_.find(mockRestaurants, restaurant => restaurant.id === id)))
+  = (id) => new Promise(resolve => resolve(_.find(mockRestaurants, restaurant => restaurant._id === id)))
 
 const getNearestRestaurants = async (userLocation, range = 20) => {
   const restaurants = await Restaurant.find({})

@@ -74,7 +74,35 @@ const updateTableReservation = async (req, res) => {
   })
 }
 
+const getMenuForRestaurant = async (req, res) => {
+  const { restaurantId } = req.params
+
+  if (!restaurantId) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid parameters!',
+    })
+  }
+
+  const menu = await RestaurantService.getMenuForRestaurant(restaurantId)
+
+  if (!menu) {
+    return res.status(500).send({
+      status: 500,
+      message: 'Error while fetching menu, please try again.',
+    })
+  }
+
+  return res.status(200).send({
+    status: 200,
+    message: {
+      menu,
+    },
+  })
+}
+
 restaurantRouter.get('/nearest', getNearestRestaurants)
 restaurantRouter.put('/:restaurantId/reserve', updateTableReservation)
+restaurantRouter.get('/:restaurantId/menu', getMenuForRestaurant)
 
 export default restaurantRouter
