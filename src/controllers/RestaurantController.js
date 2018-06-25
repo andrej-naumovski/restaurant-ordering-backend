@@ -21,13 +21,25 @@ const validateTableReservationRequest = reservationBody => {
   return Joi.validate(reservationBody, validationSchema)
 }
 
+const validateRestaurant = restaurant => {
+  const validationSchema = {
+    name: Joi.string.required(),
+    location: {
+      latitude: Joi.number.required(),
+      longitude: Joi.number.required(),
+    }
+  }
+
+  return Joi.validate(restaurant, validationSchema)
+}
+
 const restaurantRouter = Router()
 
 const getNearestRestaurants = async (req, res) => {
   const { latitude, longitude } = req.query
   const userLocation = {
-    latitude,
-    longitude,
+    latitude: Number(latitude),
+    longitude: Number(longitude),
   }
   const { error } = validateLocation(userLocation)
 
@@ -103,8 +115,38 @@ const getMenuForRestaurant = async (req, res) => {
   })
 }
 
+const createRestaurant = async (req, res) => {
+  const restaurant = req.body
+
+  const { error } = validateRestaurant(restaurant)
+
+  if (error) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid parameters!',
+    })
+  }
+  const createdRestaurant = await RestaurantService.createNewRestaurant(restaurant)
+
+  if (!createdRestaurant) {
+    return res.status(500).send({
+      status: 500,
+      message: 'An error occurred, please try again.',
+    })
+  }
+
+  return res.status(200).send({
+    status: 200,
+    message: 'Success',
+    payload: {
+      restaurant: createdRestaurant,
+    },
+  })
+}
+
 restaurantRouter.get('/nearest', getNearestRestaurants)
 restaurantRouter.put('/:restaurantId/reserve', updateTableReservation)
 restaurantRouter.get('/:restaurantId/menu', getMenuForRestaurant)
+restaurantRouter.post('/', createRestaurant)
 
 export default restaurantRouter
