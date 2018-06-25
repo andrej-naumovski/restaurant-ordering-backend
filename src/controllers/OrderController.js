@@ -26,8 +26,8 @@ const getOrderByIdAndRestaurant = async (req, res) => {
         status: 200,
         message: 'Success',
         payload: {
-            order
-        }
+            order,
+        },
     })
 }
 
