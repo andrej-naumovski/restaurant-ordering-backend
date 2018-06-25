@@ -23,10 +23,10 @@ const validateTableReservationRequest = reservationBody => {
 
 const validateRestaurant = restaurant => {
   const validationSchema = {
-    name: Joi.string.required(),
+    name: Joi.string().required(),
     location: {
-      latitude: Joi.number.required(),
-      longitude: Joi.number.required(),
+      latitude: Joi.number().required(),
+      longitude: Joi.number().required(),
     }
   }
 
@@ -118,14 +118,14 @@ const getMenuForRestaurant = async (req, res) => {
 const createRestaurant = async (req, res) => {
   const restaurant = req.body
 
-  // const { error } = validateRestaurant(restaurant)
-  //
-  // if (error) {
-  //   return res.status(400).send({
-  //     status: 400,
-  //     message: 'Invalid parameters!',
-  //   })
-  // }
+  const { error } = validateRestaurant(restaurant)
+
+  if (error) {
+    return res.status(400).send({
+      status: 400,
+      message: 'Invalid parameters!',
+    })
+  }
   const createdRestaurant = await RestaurantService.createNewRestaurant(restaurant)
 
   if (!createdRestaurant) {
