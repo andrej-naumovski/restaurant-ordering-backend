@@ -6,33 +6,21 @@ import Restaurant from '../models/persistence/Restaurant'
 // Services
 import LocationService from './LocationService'
 
-const mockRestaurants = [{
-  _id: 'id1',
-  name: 'test restaurant',
-  location: {
-    latitude: 42.0017616919817,
-    longitude: 21.4065151072028,
-  },
-  tables: [],
-  menu: {
-    categories: []
-  }
-}]
-
-Restaurant.find = () => new Promise(resolve => resolve(mockRestaurants))
-
-Restaurant.findById
-  = (id) => new Promise(resolve => resolve(_.find(mockRestaurants, restaurant => restaurant._id === id)))
-
 const getNearestRestaurants = async (userLocation, range = 20) => {
   const restaurants = await Restaurant.find({})
 
   const restaurantsWithDistances = restaurants
-    .filter(restaurant => LocationService.areLocationsWithinRange(userLocation, restaurant.location, range))
-    .map(restaurant => ({
-      ...restaurant,
-      distanceToUser: LocationService.getDistanceBetweenTwoCoordinates(userLocation, restaurant.location)
-    }))
+    .filter(restaurant => {
+      const { latitude, longitude } = restaurant.location
+      return LocationService.areLocationsWithinRange(userLocation, { latitude, longitude }, range)
+    })
+    .map(restaurant => {
+      const { latitude, longitude } = restaurant.location
+      return {
+        ...restaurant._doc,
+        distanceToUser: LocationService.getDistanceBetweenTwoCoordinates(userLocation, { latitude, longitude })
+      }
+    })
 
   const sortedRestaurants = _.sortBy(restaurantsWithDistances, restaurant => restaurant.distanceToUser)
 
@@ -74,8 +62,17 @@ const updateTableReservation = async (restaurantId, tableId, isReserved) => {
   }
 }
 
+const createNewRestaurant = async restaurant => {
+  try {
+    return await Restaurant.create(restaurant)
+  } catch (e) {
+    return null
+  }
+}
+
 export default {
   getNearestRestaurants,
   getMenuForRestaurant,
   updateTableReservation,
+  createNewRestaurant,
 }
