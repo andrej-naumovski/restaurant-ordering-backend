@@ -64,9 +64,65 @@ const updateTableReservation = async (restaurantId, tableId, isReserved) => {
 
 const createNewRestaurant = async restaurant => {
   try {
-    return await Restaurant.create(restaurant)
+    return await Restaurant.create({
+      ...restaurant,
+      menu: {
+        categories: []
+      },
+    })
   } catch (e) {
     return null
+  }
+}
+
+const addTableToRestaurant = async (restaurantId, tableData) => {
+  try {
+    const restaurant = await Restaurant.findById(restaurantId)
+
+    if (!restaurant) {
+      return false
+    }
+
+    restaurant.tables.push({ ...tableData, isAvailable: true })
+
+    await restaurant.save()
+
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
+const addCategoryToMenu = async (restaurantId, category) => {
+  try {
+    let restaurant = await Restaurant.findById(restaurantId)
+
+    if(!restaurant) {
+      return false
+    }
+
+    const { items } = category
+
+    category.items = []
+
+    restaurant.menu.categories.push(category)
+    restaurant = await restaurant.save()
+
+    const { menu } = restaurant
+
+    const savedCategory = menu.categories[menu.categories.length - 1]
+
+    const { _id } = savedCategory
+
+    menu.categories[menu.categories.length - 1].items = items.map(item => ({ ...item, category: _id }))
+
+    restaurant.menu = menu
+
+    await restaurant.save()
+
+    return true
+  } catch (e) {
+    return false
   }
 }
 
@@ -75,4 +131,6 @@ export default {
   getMenuForRestaurant,
   updateTableReservation,
   createNewRestaurant,
+  addTableToRestaurant,
+  addCategoryToMenu,
 }

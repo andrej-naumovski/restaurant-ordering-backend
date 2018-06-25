@@ -12,6 +12,8 @@ export const RestaurantSchema = mongoose.Schema({
   employees: [EmployeeSchema],
   menu: MenuSchema,
   location: LatLngSchema,
+}, {
+  usePushEach: true,
 })
 
 export default mongoose.model('Restaurant', RestaurantSchema)
