@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import Joi from 'joi'
 
 import OrderService from '../services/OrderService'
 
@@ -6,7 +7,9 @@ const getOrderByIdAndRestaurant = async (req, res) => {
   const { orderId } = req.params
   const { restaurantId } = req.query
 
-  if (!orderId || !restaurantId) {
+  const { error } = validateRestaurantAndOrderId({ orderId, restaurantId })
+
+  if (error) {
     return res.status(400).send({
       status: 400,
       message: 'Invalid params!',
@@ -36,7 +39,9 @@ const updateOrderIsCompleted = async (req, res) => {
   const { restaurantId } = req.query
   const { isCompleted } = req.body
 
-  if (!orderId || !restaurantId) {
+  const { error } = validateRestaurantAndOrderId({ orderId, restaurantId })
+
+  if (error) {
     return res.status(400).send({
       status: 400,
       message: 'Invalid parameters!',
@@ -63,7 +68,9 @@ const updateOrderIsCompleted = async (req, res) => {
 const createOrder = async (req, res) => {
   const order = req.body
 
-  if (!validateOrderObject(order)) {
+  const { error } = validateOrderObject(order)
+
+  if (error) {
     return res.status(400).send({
       status: 400,
       message: 'Invalid parameters!',
@@ -88,8 +95,29 @@ const createOrder = async (req, res) => {
   })
 }
 
-// TODO andrej-naumovski 25.06.2018: Update the validation to use Joi
-const validateOrderObject = (order) => order.restaurantId && order.tableId && order.items
+const validateOrderObject = order => {
+  const validationSchema = Joi.object().keys({
+    restaurantId: Joi.string().required(),
+    tableId: Joi.string().required(),
+    items: Joi.array().items(Joi.object({
+      _id: Joi.string().required(),
+      category: Joi.object({
+        name: Joi.string().required()
+      }).required(),
+    })),
+  })
+
+  return Joi.validate(order, validationSchema)
+}
+
+const validateRestaurantAndOrderId = idObject => {
+  const validationSchema = Joi.object().keys({
+    restaurantId: Joi.string().required(),
+    orderId: Joi.string().required(),
+  })
+
+  return Joi.validate(idObject, validationSchema)
+}
 
 const orderRouter = Router()
 
