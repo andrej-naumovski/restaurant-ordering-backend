@@ -102,7 +102,7 @@ const validateOrderObject = order => {
     items: Joi.array().items(Joi.object({
       _id: Joi.string().required(),
       category: Joi.object({
-        name: Joi.string().required()
+        _id: Joi.string().required()
       }).required(),
     })),
   })

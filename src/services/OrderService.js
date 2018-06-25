@@ -1,7 +1,6 @@
 import _ from 'lodash'
 
 import Order from '../models/persistence/Order'
-import MenuItem from '../models/persistence/MenuItem'
 
 import Money from '../models/domain/Money'
 
@@ -38,22 +37,20 @@ const createOrder = async orderDetails => {
       tableId,
     } = orderDetails
 
-    const restaurantMenu = RestaurantService.getMenuForRestaurant(restaurantId)
+    const restaurantMenu = await RestaurantService.getMenuForRestaurant(restaurantId)
 
     if (!restaurantMenu) {
       return null
     }
 
     items.forEach(async item => {
-      const category = _.find(restaurantMenu.categories, category => category.name === item.category.name)
+      const category = _.find(restaurantMenu.categories, category => category.id === item.category._id)
+
       if (!category) {
         return
       }
 
-      const menuItem = await MenuItem.findOne({
-        _id: item._id,
-        category: category._id,
-      })
+      const menuItem = _.find(category.items, itemToFind => itemToFind._id.toString() === item._id)
 
       if (!menuItem) {
         return
@@ -61,7 +58,7 @@ const createOrder = async orderDetails => {
 
       const { price } = menuItem
 
-      totalValue.add(price.value)
+      totalValue.add(price)
     })
 
     const itemIds = items.map(item => item._id)
@@ -71,7 +68,7 @@ const createOrder = async orderDetails => {
       items: itemIds,
       tableId,
       isCompleted: false,
-      totalValue,
+      totalValue: totalValue.toJSON(),
     }
 
     return await Order.create(orderToSave)
