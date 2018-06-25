@@ -1,10 +1,10 @@
-import {Router} from 'express';
+import { Router } from 'express'
 
 import OrderService from '../services/OrderService'
 
 const getOrderByIdAndRestaurant = async (req, res) => {
-  const {orderId} = req.params
-  const {restaurantId} = req.query
+  const { orderId } = req.params
+  const { restaurantId } = req.query
 
   if (!orderId || !restaurantId) {
     return res.status(400).send({
